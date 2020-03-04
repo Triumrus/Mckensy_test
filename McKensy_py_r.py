@@ -111,23 +111,31 @@ train_2 = train.iloc[:,294:]
 train_2.head()
 train_2.columns
 
+round(train.shape[0]*0.1)
+rnd=[]
+for i in range(train.shape[0]):
+  rnd.append(i)
+
+random.shuffle(rnd)
+rnd=rnd[0:round(train.shape[0]*0.1)]
+
 train_2.groupby([train_2.columns[0],train_2.columns[1],train_2.columns[2],train_2.columns[3],train_2.columns[4],train_2.columns[5]
 ]).agg({
   train_2.columns[0]: 'count',train_2.columns[1]: 'count',train_2.columns[2]: 'count',train_2.columns[3]: 'count',train_2.columns[4]: 'count',train_2.columns[5]: 'count'
   })
 
-train.shape
-
-import random
-k=[]
-for i in range(train.shape[0]):
-  k.append(i)
-
-random.seed(777)
-random.shuffle(k)
-
-train=train.iloc[k,]
-train.shape
+# train.shape
+# 
+# import random
+# k=[]
+# for i in range(train.shape[0]):
+#   k.append(i)
+# 
+# random.seed(777)
+# random.shuffle(k)
+# 
+# train=train.iloc[k,]
+# train.shape
 
 train_y_label=train.iloc[:,294:]
 train=train.drop([train_y_label.columns[0],train_y_label.columns[1],train_y_label.columns[2],train_y_label.columns[3],train_y_label.columns[4],train_y_label.columns[5]], axis=1)
@@ -156,6 +164,9 @@ choices=[1,2,3,4,5,6,7,8,9,10,11,12]
 train_y_label['class'] = np.select(conditions, choices, default=0)
 train_y_label.groupby('class').size()
 
+
+
+
 # class
 # 1       3
 # 2      45
@@ -175,8 +186,21 @@ train_y_label.groupby('class').size()
 y=train_y_label['class']
 y
 
+X_test_shuffle=X.iloc[rnd]
+y_test_shuffle=y[rnd]
+len(set(rnd))
 
+for u in rnd:
+  y=y.drop([u])
+  X=X.drop([u])
+y
+X
 
+X=X.reset_index(drop=True)
+y=y.reset_index(drop=True)
+
+X.shape
+y.shape
 from sklearn.model_selection import StratifiedKFold, KFold
 import numpy as np
 from sklearn.metrics import accuracy_score
@@ -190,9 +214,9 @@ for train_index, test_index in skf.split(X, y):
         # np.bincount(y[train]), np.bincount(y[test])))
     X_train, X_test = X.iloc[train_index,], X.iloc[test_index,]
     y_train, y_test = y[train_index], y[test_index]
-    clf=LogisticRegression(random_state=777,max_iter=5000).fit(X_train, y_train)
+    clf=LogisticRegression(random_state=777).fit(X_train, y_train)
     l.append(accuracy_score(y_test, clf.predict(X_test)))
-    print(accuracy_score(y_test, clf.predict(X_test)))
+    print(accuracy_score(y_test, clf.predict(X_test)),'|||',accuracy_score(y_train, clf.predict(X_train)))
 
 print(np.mean(l))
 
@@ -209,9 +233,9 @@ accuracy_score(
 y_test[0:3],
 clf.predict(X_test)[0:3])
 
+accuracy_score(clf.predict(X_train),y_train)
 
-
-
+accuracy_score(clf.predict(X_test_shuffle),y_test_shuffle)
 
 
 
