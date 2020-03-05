@@ -229,6 +229,7 @@ print(np.mean(l))
 # it is predict one Vs ALL
 # delet fitches
 # Use PCA 
+# use normal class , maybde ignor some row and class
 accuracy_score(
 y_test[0:3],
 clf.predict(X_test)[0:3])
